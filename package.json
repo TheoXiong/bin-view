@@ -1,6 +1,6 @@
 {
   "name": "bin-view",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A simple command line tool for view binary files",
   "bin": {
     "bin": "bin/bin",
@@ -23,5 +23,13 @@
   "dependencies": {
     "chalk": "^2.4.2",
     "commander": "^2.19.0"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TheoXiong/bin-view.git"
+  },
+  "bugs": {
+    "url": "https://github.com/TheoXiong/bin-view/issues"
+  },
+  "homepage": "https://github.com/TheoXiong/bin-view#readme"
 }
