@@ -1,0 +1,11 @@
+#!/usr/bin/env node
+
+const program = require('commander')
+
+program
+  .version(require('../package').version)
+  .usage('<command> [options]')
+  .command('convert', 'Convert binary content to Hexadecimal string, saved in *.txt file')
+  .command('view', 'View binary data on console')
+
+program.parse(process.argv)

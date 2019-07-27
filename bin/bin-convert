@@ -1,0 +1,89 @@
+#!/usr/bin/env node
+
+const path = require('path')
+const chalk = require('chalk')
+const { binaryToHexStr } = require('../lib/convert.js')
+const { writeFile } = require('../lib/file.js')
+const { parseArgv } = require('../lib/util.js')
+
+const COMMANDS = ['-l', '-s']
+
+const convert = async (filePath, options) => {
+  let hexStr = await binaryToHexStr(filePath, options)
+    .catch(err => { throw err })
+  await writeFile(`${filePath}.txt`, hexStr)
+    .catch(err => { throw err })
+  return true
+}
+
+const run = async (input, options) => {
+  console.log()
+  console.log(chalk.bold.rgb(255, 255, 0)('  Start to convert.'))
+  console.log()
+
+  let successedNum = 0
+  let failedNum = 0
+
+  for (let i = 0; i < input.params.length; i++) {
+    let result = true
+    const filePath = path.resolve(input.params[i])
+    await convert(filePath, options)
+      .catch(err => {
+        failedNum++
+        result = false
+        console.log(chalk.red(`  [ Error ] ${err.message}`))
+      })
+
+    if (!result) continue
+    successedNum++
+    console.log(chalk.green(`  [ Success ] the result is saved in ${filePath}.txt`))
+  }
+
+  console.log()
+  console.log(chalk.rgb(255, 255, 0)(`  ${successedNum} successed, ${failedNum} failed.`))
+  console.log(chalk.bold.rgb(255, 255, 0)('  Done.'))
+  console.log()
+  return true
+}
+
+const help = () => {
+  console.log('Usage: bin convert [options] <paths>')
+  console.log()
+  console.log('Options: ')
+  console.log('  -l    specify the byte length to convert')
+  console.log('  -s    hidden line number')
+  console.log()
+  console.log('  Examples:')
+  console.log()
+  console.log(chalk.gray('    # default usage'))
+  console.log('    $ bin convert bin-file-path')
+  console.log()
+  console.log(chalk.gray('    # batch conversion'))
+  console.log('    $ bin convert bin-file-path1 bin-file-path2 bin-file-path3')
+  console.log()
+  console.log(chalk.gray('    # specify the byte length'))
+  console.log('    $ bin convert -l 100 bin-file-path')
+  console.log()
+  console.log(chalk.gray('    # hidden line number'))
+  console.log('    $ bin convert -s line=0 bin-file-path')
+  console.log()
+}
+
+let argv = process.argv
+if (argv && argv.length >= 3) {
+  let input = parseArgv(argv, COMMANDS)
+  if (!(input && input.params)) return help()
+  let options = {}
+  if (input.cmds && Object.keys(input.cmds).length > 0) {
+    if (input.cmds['-l']) {
+      options.targetLength = input.cmds['-l']
+    }
+    if (input.cmds['-s'] === 'line=0') {
+      options.line = false
+    }
+  }
+
+  run(input, options)
+} else {
+  help()
+}
